@@ -72,9 +72,9 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-inner">
-          <h1 className="logo">💰 Money Monitor</h1>
+          <h1 className="logo">€ Money Monitor</h1>
           <button className="btn btn-primary add-btn" onClick={() => setShowForm(true)}>
-            + Add Transaction
+            + Add
           </button>
         </div>
       </header>
@@ -117,6 +117,8 @@ export default function App() {
           </>
         )}
       </main>
+
+      <button className="fab" onClick={() => setShowForm(true)} aria-label="Add Transaction">+</button>
 
       {showForm && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>

@@ -3,6 +3,9 @@ import { useState } from 'react';
 export default function TransactionList({ transactions, categories, onDelete, onAdd }) {
   const [filter, setFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [password, setPassword] = useState('');
+  const [pwError, setPwError] = useState(false);
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
 
   const filtered = transactions.filter(tx => {
@@ -10,6 +13,18 @@ export default function TransactionList({ transactions, categories, onDelete, on
     if (catFilter && String(tx.category_id) !== catFilter) return false;
     return true;
   });
+
+  const openDelete = (id) => { setDeleteTarget(id); setPassword(''); setPwError(false); };
+  const cancelDelete = () => { setDeleteTarget(null); setPassword(''); setPwError(false); };
+  const confirmDelete = () => {
+    if (password === '1993') {
+      onDelete(deleteTarget);
+      cancelDelete();
+    } else {
+      setPwError(true);
+      setPassword('');
+    }
+  };
 
   return (
     <div className="tx-page">
@@ -48,11 +63,33 @@ export default function TransactionList({ transactions, categories, onDelete, on
                 <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
                   {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                 </span>
-                <button className="delete-btn" onClick={() => onDelete(tx.id)} title="Delete">✕</button>
+                <button className="delete-btn" onClick={() => openDelete(tx.id)} title="Delete">✕</button>
               </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {deleteTarget !== null && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && cancelDelete()}>
+          <div className="pw-modal">
+            <h3>Delete Transaction</h3>
+            <p>Enter your password to confirm deletion.</p>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              autoFocus
+              onChange={e => { setPassword(e.target.value); setPwError(false); }}
+              onKeyDown={e => e.key === 'Enter' && confirmDelete()}
+            />
+            {pwError && <p className="error-msg">Incorrect password</p>}
+            <div className="pw-actions">
+              <button className="btn btn-ghost" onClick={cancelDelete}>Cancel</button>
+              <button className="btn btn-expense" onClick={confirmDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

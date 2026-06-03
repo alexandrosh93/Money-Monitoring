@@ -16,7 +16,7 @@ export default defineConfig({
         name: 'Money Monitor',
         short_name: 'Money',
         description: 'Track your income and expenses',
-        theme_color: '#6366f1',
+        theme_color: '#2563eb',
         background_color: '#f1f5f9',
         display: 'standalone',
         orientation: 'portrait',
