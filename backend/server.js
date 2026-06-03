@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import db from './db.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(cors());
@@ -87,5 +91,12 @@ app.get('/api/summary', (req, res) => {
   res.json({ income, expense, balance: income - expense, byCategory });
 });
 
+// Serve built frontend in production
+const frontendDist = join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDist));
+app.get('*', (req, res) => {
+  res.sendFile(join(frontendDist, 'index.html'));
+});
+
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
