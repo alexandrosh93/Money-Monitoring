@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from './supabase.js';
 import Dashboard from './components/Dashboard.jsx';
 import TransactionList from './components/TransactionList.jsx';
 import TransactionForm from './components/TransactionForm.jsx';
@@ -15,14 +16,34 @@ export default function App() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [sumRes, txRes, catRes] = await Promise.all([
-        fetch('/api/summary'),
-        fetch('/api/transactions'),
-        fetch('/api/categories'),
+      const [{ data: cats }, { data: txs }] = await Promise.all([
+        supabase.from('categories').select('*').order('type').order('name'),
+        supabase.from('transactions')
+          .select('*, categories(name, color)')
+          .order('date', { ascending: false })
+          .order('created_at', { ascending: false }),
       ]);
-      setSummary(await sumRes.json());
-      setTransactions(await txRes.json());
-      setCategories(await catRes.json());
+
+      const normalizedTxs = (txs || []).map(t => ({
+        ...t,
+        category_name: t.categories?.name,
+        category_color: t.categories?.color,
+      }));
+
+      const income = normalizedTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const expense = normalizedTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+
+      const catMap = {};
+      normalizedTxs.forEach(t => {
+        const key = `${t.category_id}-${t.type}`;
+        if (!catMap[key]) catMap[key] = { name: t.category_name, color: t.category_color, type: t.type, total: 0 };
+        catMap[key].total += t.amount;
+      });
+      const byCategory = Object.values(catMap).sort((a, b) => b.total - a.total);
+
+      setCategories(cats || []);
+      setTransactions(normalizedTxs);
+      setSummary({ income, expense, balance: income - expense, byCategory });
     } finally {
       setLoading(false);
     }
@@ -31,17 +52,19 @@ export default function App() {
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const handleAddTransaction = async (data) => {
-    await fetch('/api/transactions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+    await supabase.from('transactions').insert({
+      amount: data.amount,
+      type: data.type,
+      category_id: data.category_id || null,
+      description: data.description || null,
+      date: data.date,
     });
     setShowForm(false);
     fetchAll();
   };
 
   const handleDeleteTransaction = async (id) => {
-    await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+    await supabase.from('transactions').delete().eq('id', id);
     fetchAll();
   };
 

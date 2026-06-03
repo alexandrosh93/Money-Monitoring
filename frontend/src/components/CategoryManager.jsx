@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '../supabase.js';
 
 export default function CategoryManager({ categories, onRefresh }) {
   const [form, setForm] = useState({ name: '', type: 'expense', color: '#6366f1' });
@@ -10,22 +11,16 @@ export default function CategoryManager({ categories, onRefresh }) {
   const handleAdd = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await fetch('/api/categories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+    const { error: err } = await supabase.from('categories').insert({
+      name: form.name.trim(), type: form.type, color: form.color,
     });
-    if (res.ok) {
-      setForm({ name: '', type: 'expense', color: '#6366f1' });
-      onRefresh();
-    } else {
-      const d = await res.json();
-      setError(d.error || 'Failed to add category');
-    }
+    if (err) { setError(err.message); return; }
+    setForm({ name: '', type: 'expense', color: '#6366f1' });
+    onRefresh();
   };
 
   const handleDelete = async (id) => {
-    await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+    await supabase.from('categories').delete().eq('id', id);
     onRefresh();
   };
 
