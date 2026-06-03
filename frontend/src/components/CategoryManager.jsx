@@ -15,7 +15,7 @@ export default function CategoryManager({ categories, onRefresh }) {
       name: form.name.trim(), type: form.type, color: form.color,
     });
     if (err) { setError(err.message); return; }
-    setForm({ name: '', type: 'expense', color: '#6366f1' });
+    setForm(f => ({ ...f, name: '', color: '#6366f1' }));
     onRefresh();
   };
 
@@ -65,7 +65,9 @@ export default function CategoryManager({ categories, onRefresh }) {
             </div>
           </div>
           {error && <p className="error-msg">{error}</p>}
-          <button type="submit" className="btn btn-primary">Add Category</button>
+          <button type="submit" className={`btn ${form.type === 'income' ? 'btn-income' : 'btn-expense'}`}>
+            Add {form.type === 'income' ? 'Income' : 'Expense'} Category
+          </button>
         </form>
       </div>
 
