@@ -1,6 +1,6 @@
 export default function Dashboard({ summary, transactions }) {
   const recent = transactions.slice(0, 5);
-  const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+  const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
 
   return (
     <div className="dashboard">

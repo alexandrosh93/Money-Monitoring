@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function TransactionList({ transactions, categories, onDelete, onAdd }) {
   const [filter, setFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('');
-  const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+  const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
 
   const filtered = transactions.filter(tx => {
     if (filter !== 'all' && tx.type !== filter) return false;
