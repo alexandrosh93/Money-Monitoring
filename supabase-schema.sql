@@ -29,12 +29,6 @@ insert into categories (name, type, color) values
   ('Gift',          'income',  '#4ade80'),
   ('Investment',    'income',  '#86efac'),
   ('Other Income',  'income',  '#bbf7d0'),
-  ('Food & Dining', 'expense', '#ef4444'),
-  ('Transport',     'expense', '#f97316'),
-  ('Entertainment', 'expense', '#a855f7'),
-  ('Rent',          'expense', '#dc2626'),
-  ('Utilities',     'expense', '#ea580c'),
-  ('Healthcare',    'expense', '#ec4899'),
-  ('Shopping',      'expense', '#8b5cf6'),
-  ('Education',     'expense', '#06b6d4'),
-  ('Other Expense', 'expense', '#94a3b8');
+  ('Rent',         'expense', '#dc2626'),
+  ('Pocket Money', 'expense', '#f97316'),
+  ('Utilities',    'expense', '#ea580c');
