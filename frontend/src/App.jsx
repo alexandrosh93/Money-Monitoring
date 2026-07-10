@@ -19,7 +19,7 @@ export default function App() {
   const [tab, setTab] = useState('dashboard');
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState('transaction');
-  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [], byPerson: [] });
+  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [], byPerson: [], totalCash: 0, totalBank: 0 });
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -79,10 +79,14 @@ export default function App() {
       });
       const byPerson = Object.values(personMap).sort((a, b) => b.total - a.total);
 
+      // Standalone accounts (e.g. Main Pool) count entirely as cash
+      const totalCash = byAccount.reduce((s, a) => s + a.balance, 0) + byPerson.reduce((s, p) => s + p.cash, 0);
+      const totalBank = byPerson.reduce((s, p) => s + p.bank, 0);
+
       setCategories(cats || []);
       setAccounts(accts || []);
       setTransactions(numericTxs);
-      setSummary({ income, expense, balance: income - expense, byCategory, byAccount, byPerson });
+      setSummary({ income, expense, balance: income - expense, byCategory, byAccount, byPerson, totalCash, totalBank });
     } finally {
       setLoading(false);
     }

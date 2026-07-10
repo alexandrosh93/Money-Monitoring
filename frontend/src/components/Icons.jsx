@@ -83,6 +83,22 @@ export const IconChevronRight = ({ size = 18 }) => (
   </svg>
 );
 
+export const IconCash = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <circle cx="12" cy="12" r="2.5" />
+    <path d="M6 9v.01M18 15v.01" strokeWidth={2.6} />
+  </svg>
+);
+
+export const IconBank = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <path d="M3 10 12 4l9 6" />
+    <path d="M4.5 10v9M9.5 10v9M14.5 10v9M19.5 10v9" />
+    <path d="M2.5 21h19" />
+  </svg>
+);
+
 export const IconEmpty = ({ size = 40 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <rect x="3" y="6" width="18" height="13" rx="2" />

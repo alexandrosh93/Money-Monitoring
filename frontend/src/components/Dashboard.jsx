@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconArrowUp, IconArrowDown, IconSwap, IconChevronRight, IconEmpty } from './Icons.jsx';
+import { IconArrowUp, IconArrowDown, IconSwap, IconChevronRight, IconCash, IconBank, IconEmpty } from './Icons.jsx';
 import AccountStatement from './AccountStatement.jsx';
 
 export default function Dashboard({ summary, transactions }) {
@@ -26,6 +26,23 @@ export default function Dashboard({ summary, transactions }) {
           <div className="mini-card-body">
             <span className="card-label">Expenses</span>
             <span className="card-amount expense-color">{fmt(summary.expense)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="cashbank-row">
+        <div className="card mini-card">
+          <span className="mini-icon cash"><IconCash size={17} /></span>
+          <div className="mini-card-body">
+            <span className="card-label">Total Cash</span>
+            <span className="card-amount cash-color">{fmt(summary.totalCash)}</span>
+          </div>
+        </div>
+        <div className="card mini-card">
+          <span className="mini-icon bank"><IconBank size={17} /></span>
+          <div className="mini-card-body">
+            <span className="card-label">Total Bank</span>
+            <span className="card-amount bank-color">{fmt(summary.totalBank)}</span>
           </div>
         </div>
       </div>

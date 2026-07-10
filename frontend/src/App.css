@@ -8,6 +8,10 @@
   --income-bg: #dcfce7;
   --expense: #dc2626;
   --expense-bg: #fee2e2;
+  --cash: #0d9488;
+  --cash-bg: #ccfbf1;
+  --bank: #7c3aed;
+  --bank-bg: #ede9fe;
   --bg: #f1f5f9;
   --card: #ffffff;
   --card-alt: #f8fafc;
@@ -31,6 +35,10 @@
     --income-bg: rgba(74,222,128,0.14);
     --expense: #f87171;
     --expense-bg: rgba(248,113,113,0.14);
+    --cash: #2dd4bf;
+    --cash-bg: rgba(45,212,191,0.14);
+    --bank: #a78bfa;
+    --bank-bg: rgba(167,139,250,0.16);
     --bg: #0b1220;
     --card: #131c2e;
     --card-alt: #1a2540;
@@ -138,6 +146,9 @@ button, input, select { font-family: inherit; }
 .mini-icon { width: 2.125rem; height: 2.125rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .mini-icon.income { background: var(--income-bg); color: var(--income); }
 .mini-icon.expense { background: var(--expense-bg); color: var(--expense); }
+.mini-icon.cash { background: var(--cash-bg); color: var(--cash); }
+.mini-icon.bank { background: var(--bank-bg); color: var(--bank); }
+.cashbank-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; margin-bottom: 0.875rem; }
 .mini-card-body { display: flex; flex-direction: column; gap: 0.0625rem; min-width: 0; }
 .card-label { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-bottom: 0.3125rem; text-transform: uppercase; letter-spacing: 0.02em; }
 .card-amount { display: block; font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
@@ -145,6 +156,8 @@ button, input, select { font-family: inherit; }
 .income-color { color: var(--income); }
 .expense-color { color: var(--expense); }
 .transfer-color { color: var(--primary); }
+.cash-color { color: var(--cash); }
+.bank-color { color: var(--bank); }
 
 /* Bars */
 .category-bars { display: flex; flex-direction: column; gap: 0.75rem; }
