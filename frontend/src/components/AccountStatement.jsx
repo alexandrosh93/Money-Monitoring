@@ -1,9 +1,9 @@
 import { IconArrowUp, IconArrowDown, IconSwap, IconClose, IconEmpty } from './Icons.jsx';
 
-export default function AccountStatement({ account, transactions, onClose }) {
+export default function AccountStatement({ title, color, accountIds, transactions, onClose }) {
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
 
-  const accountTxs = transactions.filter(t => t.account_id === account.id);
+  const accountTxs = transactions.filter(t => accountIds.includes(t.account_id));
   const ascending = [...accountTxs].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
     return String(a.created_at || '').localeCompare(String(b.created_at || ''));
@@ -23,8 +23,8 @@ export default function AccountStatement({ account, transactions, onClose }) {
         <div className="modal-handle" />
         <div className="modal-header">
           <h2>
-            <span className="cat-dot" style={{ background: account.color, marginRight: '0.5rem' }} />
-            {account.name}
+            <span className="cat-dot" style={{ background: color, marginRight: '0.5rem' }} />
+            {title}
           </h2>
           <button className="close-btn" onClick={onClose} aria-label="Close"><IconClose size={16} /></button>
         </div>
@@ -49,7 +49,7 @@ export default function AccountStatement({ account, transactions, onClose }) {
                 </span>
                 <div className="tx-info">
                   <span className="tx-desc">{tx.description || tx.category_name || 'Transaction'}</span>
-                  <span className="tx-meta">{tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
+                  <span className="tx-meta">{tx.account_name ? `${tx.account_name} · ` : ''}{tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
                 </div>
                 <div className="statement-amounts">
                   <span className={`tx-amount ${tx.is_transfer ? 'transfer-color' : (tx.type === 'income' ? 'income-color' : 'expense-color')}`}>

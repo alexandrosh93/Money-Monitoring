@@ -1,8 +1,11 @@
-import { IconArrowUp, IconArrowDown, IconSwap, IconEmpty } from './Icons.jsx';
+import { useState } from 'react';
+import { IconArrowUp, IconArrowDown, IconSwap, IconChevronRight, IconEmpty } from './Icons.jsx';
+import AccountStatement from './AccountStatement.jsx';
 
 export default function Dashboard({ summary, transactions }) {
   const recent = transactions.slice(0, 5);
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
+  const [statementTarget, setStatementTarget] = useState(null);
 
   return (
     <div className="dashboard">
@@ -30,9 +33,14 @@ export default function Dashboard({ summary, transactions }) {
       {summary.byPerson?.length > 0 && (
         <div className="card">
           <h3 className="section-title">Balances by Person</h3>
+          <p className="helper-text">Tap a person to see their combined Cash + Bank movements.</p>
           <div className="person-grid">
             {summary.byPerson.map(person => (
-              <div key={person.name} className="person-card">
+              <div
+                key={person.name}
+                className="person-card clickable"
+                onClick={() => setStatementTarget({ title: person.name, color: 'var(--primary)', accountIds: person.accountIds })}
+              >
                 <div className="person-header">
                   <span className="person-name">
                     <span className="person-avatar" style={{ background: `linear-gradient(135deg, var(--primary), var(--primary-dark))` }}>
@@ -57,12 +65,17 @@ export default function Dashboard({ summary, transactions }) {
           <h3 className="section-title">Account Balances</h3>
           <div className="account-grid">
             {summary.byAccount.map(account => (
-              <div key={account.id} className="account-card">
+              <div
+                key={account.id}
+                className="account-card clickable"
+                onClick={() => setStatementTarget({ title: account.name, color: account.color, accountIds: [account.id] })}
+              >
                 <span className="cat-dot" style={{ background: account.color }} />
                 <div className="account-card-info">
                   <span className="account-name">{account.name}</span>
                   <span className={`account-balance ${account.balance >= 0 ? 'income-color' : 'expense-color'}`}>{fmt(account.balance)}</span>
                 </div>
+                <IconChevronRight size={16} />
               </div>
             ))}
           </div>
@@ -121,6 +134,16 @@ export default function Dashboard({ summary, transactions }) {
           </ul>
         )}
       </div>
+
+      {statementTarget && (
+        <AccountStatement
+          title={statementTarget.title}
+          color={statementTarget.color}
+          accountIds={statementTarget.accountIds}
+          transactions={transactions}
+          onClose={() => setStatementTarget(null)}
+        />
+      )}
     </div>
   );
 }

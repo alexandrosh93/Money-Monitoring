@@ -71,10 +71,11 @@ export default function App() {
 
       const personMap = {};
       allAccounts.filter(a => a.group_name).forEach(a => {
-        if (!personMap[a.group_name]) personMap[a.group_name] = { name: a.group_name, cash: 0, bank: 0, total: 0 };
+        if (!personMap[a.group_name]) personMap[a.group_name] = { name: a.group_name, cash: 0, bank: 0, total: 0, accountIds: [] };
         if (a.kind === 'cash') personMap[a.group_name].cash += a.balance;
         if (a.kind === 'bank') personMap[a.group_name].bank += a.balance;
         personMap[a.group_name].total += a.balance;
+        personMap[a.group_name].accountIds.push(a.id);
       });
       const byPerson = Object.values(personMap).sort((a, b) => b.total - a.total);
 

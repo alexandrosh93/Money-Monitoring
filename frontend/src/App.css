@@ -293,7 +293,11 @@ button, input, select { font-family: inherit; }
 .account-grid { display: grid; grid-template-columns: 1fr; gap: 0.625rem; }
 @media (min-width: 560px) { .account-grid { grid-template-columns: 1fr 1fr; } }
 .account-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-alt); }
-.account-card-info { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+.account-card-info { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1; }
+.clickable { cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.clickable:hover { background: var(--border); }
+.clickable:active { transform: scale(0.98); }
+.account-card .account-row-chevron, .account-card > svg { color: var(--muted); flex-shrink: 0; }
 .account-name { font-weight: 600; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .account-balance { font-weight: 700; font-size: 1.0625rem; }
 .helper-text { color: var(--muted); font-size: 0.8125rem; margin: -0.375rem 0 0.875rem; line-height: 1.45; }

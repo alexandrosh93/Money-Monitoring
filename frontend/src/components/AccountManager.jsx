@@ -155,7 +155,9 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
 
       {selectedAccount && (
         <AccountStatement
-          account={selectedAccount}
+          title={selectedAccount.name}
+          color={selectedAccount.color}
+          accountIds={[selectedAccount.id]}
           transactions={transactions}
           onClose={() => setSelectedAccount(null)}
         />
