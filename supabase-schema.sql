@@ -1,13 +1,14 @@
 -- Run this in your Supabase project: Dashboard → SQL Editor → New query → paste → Run
+-- This app uses money_monitor_* table names so it does not touch Anna's or any other project's tables.
 
-create table if not exists accounts (
+create table if not exists money_monitor_accounts (
   id         bigint primary key generated always as identity,
   name       text not null unique,
   color      text not null default '#2563eb',
   created_at timestamptz default now()
 );
 
-create table if not exists categories (
+create table if not exists money_monitor_categories (
   id         bigint primary key generated always as identity,
   name       text not null unique,
   type       text not null check (type in ('income', 'expense')),
@@ -15,27 +16,24 @@ create table if not exists categories (
   created_at timestamptz default now()
 );
 
-create table if not exists transactions (
+create table if not exists money_monitor_transactions (
   id          bigint primary key generated always as identity,
   amount      numeric not null check (amount > 0),
   type        text not null check (type in ('income', 'expense')),
-  category_id bigint references categories(id) on delete set null,
-  account_id  bigint references accounts(id) on delete restrict,
+  category_id bigint references money_monitor_categories(id) on delete set null,
+  account_id  bigint references money_monitor_accounts(id) on delete restrict,
   description text,
   date        date not null,
   created_at  timestamptz default now()
 );
 
--- Add account support to an existing Money Monitor database without touching any unrelated Supabase tables
-alter table transactions add column if not exists account_id bigint references accounts(id) on delete restrict;
+-- Allow public access for the Money Monitor app only (personal app, no login required)
+alter table money_monitor_accounts     disable row level security;
+alter table money_monitor_categories   disable row level security;
+alter table money_monitor_transactions disable row level security;
 
--- Allow public access (personal app, no login required)
-alter table accounts    disable row level security;
-alter table categories  disable row level security;
-alter table transactions disable row level security;
-
--- Seed default categories
-insert into categories (name, type, color) values
+-- Seed default Money Monitor categories without overwriting existing rows
+insert into money_monitor_categories (name, type, color) values
   ('Salary',        'income',  '#22c55e'),
   ('Freelance',     'income',  '#16a34a'),
   ('Gift',          'income',  '#4ade80'),
@@ -46,9 +44,8 @@ insert into categories (name, type, color) values
   ('Utilities',    'expense', '#ea580c')
 on conflict (name) do nothing;
 
-
--- Seed default accounts for separate balances
-insert into accounts (name, color) values
+-- Seed default Money Monitor accounts for separate balances without overwriting existing rows
+insert into money_monitor_accounts (name, color) values
   ('Main Pool', '#2563eb'),
   ('Anna', '#ec4899'),
   ('Stelios', '#f97316'),

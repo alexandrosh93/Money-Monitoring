@@ -11,7 +11,7 @@ export default function AccountManager({ accounts, onRefresh }) {
     setError('');
     const trimmed = name.trim();
     if (!trimmed) return;
-    const { error: err } = await supabase.from('accounts').insert({ name: trimmed, color });
+    const { error: err } = await supabase.from('money_monitor_accounts').insert({ name: trimmed, color });
     if (err) { setError(err.message); return; }
     setName('');
     setColor('#2563eb');
@@ -19,7 +19,7 @@ export default function AccountManager({ accounts, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    const { error: err } = await supabase.from('accounts').delete().eq('id', id);
+    const { error: err } = await supabase.from('money_monitor_accounts').delete().eq('id', id);
     if (err) { setError(err.message); return; }
     onRefresh();
   };

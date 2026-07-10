@@ -21,20 +21,20 @@ export default function App() {
     setLoading(true);
     try {
       const [{ data: cats }, { data: accts }, { data: txs }] = await Promise.all([
-        supabase.from('categories').select('*').order('type').order('name'),
-        supabase.from('accounts').select('*').order('name'),
-        supabase.from('transactions')
-          .select('*, categories(name, color), accounts(name, color)')
+        supabase.from('money_monitor_categories').select('*').order('type').order('name'),
+        supabase.from('money_monitor_accounts').select('*').order('name'),
+        supabase.from('money_monitor_transactions')
+          .select('*, money_monitor_categories(name, color), money_monitor_accounts(name, color)')
           .order('date', { ascending: false })
           .order('created_at', { ascending: false }),
       ]);
 
       const normalizedTxs = (txs || []).map(t => ({
         ...t,
-        category_name: t.categories?.name,
-        category_color: t.categories?.color,
-        account_name: t.accounts?.name,
-        account_color: t.accounts?.color,
+        category_name: t.money_monitor_categories?.name,
+        category_color: t.money_monitor_categories?.color,
+        account_name: t.money_monitor_accounts?.name,
+        account_color: t.money_monitor_accounts?.color,
       }));
 
       const numericTxs = normalizedTxs.map(t => ({ ...t, amount: Number(t.amount) }));
@@ -71,7 +71,7 @@ export default function App() {
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const handleAddTransaction = async (data) => {
-    await supabase.from('transactions').insert({
+    await supabase.from('money_monitor_transactions').insert({
       amount: data.amount,
       type: data.type,
       category_id: data.category_id || null,
@@ -87,7 +87,7 @@ export default function App() {
     const fromAccount = accounts.find(a => String(a.id) === String(data.from_account_id));
     const toAccount = accounts.find(a => String(a.id) === String(data.to_account_id));
     const note = data.description || `Transfer from ${fromAccount?.name || 'account'} to ${toAccount?.name || 'account'}`;
-    await supabase.from('transactions').insert([
+    await supabase.from('money_monitor_transactions').insert([
       { amount: data.amount, type: 'expense', category_id: null, account_id: data.from_account_id, description: note, date: data.date },
       { amount: data.amount, type: 'income', category_id: null, account_id: data.to_account_id, description: note, date: data.date },
     ]);
@@ -96,7 +96,7 @@ export default function App() {
   };
 
   const handleDeleteTransaction = async (id) => {
-    await supabase.from('transactions').delete().eq('id', id);
+    await supabase.from('money_monitor_transactions').delete().eq('id', id);
     fetchAll();
   };
 
