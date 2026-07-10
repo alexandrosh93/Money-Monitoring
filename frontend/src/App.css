@@ -265,6 +265,16 @@ button, input, select { font-family: inherit; }
 .cat-item:hover { background: var(--card-alt); }
 .cat-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 .cat-name { flex: 1; font-size: 0.9375rem; font-weight: 500; }
+.account-row { cursor: pointer; }
+.account-balance-mini { font-weight: 700; font-size: 0.875rem; white-space: nowrap; }
+.account-row-chevron { color: var(--muted); display: flex; align-items: center; flex-shrink: 0; }
+
+/* Account statement */
+.statement-modal { max-width: 520px; }
+.statement-balance { background: var(--card-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
+.statement-list { padding: 0; }
+.statement-amounts { display: flex; flex-direction: column; align-items: flex-end; gap: 0.125rem; flex-shrink: 0; }
+.statement-running { font-size: 0.75rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
 
 /* States */
 .empty-state { color: var(--muted); text-align: center; padding: 0.5rem 0 1.5rem; font-size: 0.9375rem; }

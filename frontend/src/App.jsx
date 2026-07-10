@@ -157,7 +157,7 @@ export default function App() {
               />
             )}
             {tab === 'accounts' && (
-              <AccountManager accounts={accounts} onRefresh={fetchAll} />
+              <AccountManager accounts={accounts} transactions={transactions} onRefresh={fetchAll} />
             )}
             {tab === 'categories' && (
               <CategoryManager categories={categories} onRefresh={fetchAll} />

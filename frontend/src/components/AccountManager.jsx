@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import { supabase } from '../supabase.js';
-import { IconTrash } from './Icons.jsx';
+import { IconTrash, IconChevronRight } from './Icons.jsx';
+import AccountStatement from './AccountStatement.jsx';
 
-export default function AccountManager({ accounts, onRefresh }) {
+export default function AccountManager({ accounts, transactions, onRefresh }) {
   const [isPersonAccount, setIsPersonAccount] = useState(false);
   const [name, setName] = useState('');
   const [personName, setPersonName] = useState('');
   const [kind, setKind] = useState('cash');
   const [color, setColor] = useState('#2563eb');
   const [error, setError] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState(null);
+
+  const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
+  const balanceFor = (accountId) =>
+    transactions
+      .filter(t => t.account_id === accountId)
+      .reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
 
   const resetForm = () => {
     setName('');
@@ -49,6 +57,20 @@ export default function AccountManager({ accounts, onRefresh }) {
     (acc[a.group_name] = acc[a.group_name] || []).push(a);
     return acc;
   }, {});
+
+  const AccountRow = ({ account, label }) => (
+    <li className="cat-item account-row" onClick={() => setSelectedAccount(account)}>
+      <span className="cat-dot" style={{ background: account.color }} />
+      <span className="cat-name">{label}</span>
+      <span className={`account-balance-mini ${balanceFor(account.id) >= 0 ? 'income-color' : 'expense-color'}`}>
+        {fmt(balanceFor(account.id))}
+      </span>
+      <span className="account-row-chevron"><IconChevronRight size={16} /></span>
+      <button className="delete-btn" onClick={(e) => { e.stopPropagation(); handleDelete(account.id); }} title="Delete" aria-label="Delete">
+        <IconTrash size={15} />
+      </button>
+    </li>
+  );
 
   return (
     <div className="account-page">
@@ -107,16 +129,13 @@ export default function AccountManager({ accounts, onRefresh }) {
 
       <div className="card">
         <h3 className="section-title">Accounts</h3>
+        <p className="helper-text">Tap an account to see its statement and running balance.</p>
         {accounts.length === 0 ? <p className="empty-state">No accounts yet.</p> : (
           <>
             {standalone.length > 0 && (
               <ul className="cat-list">
                 {standalone.map(account => (
-                  <li key={account.id} className="cat-item">
-                    <span className="cat-dot" style={{ background: account.color }} />
-                    <span className="cat-name">{account.name}</span>
-                    <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
-                  </li>
+                  <AccountRow key={account.id} account={account} label={account.name} />
                 ))}
               </ul>
             )}
@@ -125,11 +144,7 @@ export default function AccountManager({ accounts, onRefresh }) {
                 <h4 className="account-group-title">{person}</h4>
                 <ul className="cat-list">
                   {accts.map(account => (
-                    <li key={account.id} className="cat-item">
-                      <span className="cat-dot" style={{ background: account.color }} />
-                      <span className="cat-name">{account.kind === 'cash' ? 'Cash' : 'Bank'}</span>
-                      <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
-                    </li>
+                    <AccountRow key={account.id} account={account} label={account.kind === 'cash' ? 'Cash' : 'Bank'} />
                   ))}
                 </ul>
               </div>
@@ -137,6 +152,14 @@ export default function AccountManager({ accounts, onRefresh }) {
           </>
         )}
       </div>
+
+      {selectedAccount && (
+        <AccountStatement
+          account={selectedAccount}
+          transactions={transactions}
+          onClose={() => setSelectedAccount(null)}
+        />
+      )}
     </div>
   );
 }

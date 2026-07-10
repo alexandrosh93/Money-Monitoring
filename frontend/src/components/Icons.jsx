@@ -77,6 +77,12 @@ export const IconEuro = ({ size = 26 }) => (
   </svg>
 );
 
+export const IconChevronRight = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base} strokeWidth={2.2}>
+    <path d="M9 6l6 6-6 6" />
+  </svg>
+);
+
 export const IconEmpty = ({ size = 40 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <rect x="3" y="6" width="18" height="13" rx="2" />
