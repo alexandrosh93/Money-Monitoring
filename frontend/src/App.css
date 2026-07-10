@@ -146,3 +146,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* Page layouts */
 .dashboard, .tx-page, .cat-page { }
+
+/* Accounts */
+.account-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+@media (min-width: 560px) { .account-grid { grid-template-columns: 1fr 1fr; } }
+.account-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border: 1px solid var(--border); border-radius: 10px; background: #f8fafc; }
+.account-card-info { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+.account-name { font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account-balance { font-weight: 700; font-size: 1.125rem; }
+.helper-text { color: var(--muted); font-size: 0.875rem; margin: -0.5rem 0 1rem; line-height: 1.4; }
+.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.header-btn { color: white; background: rgba(255,255,255,0.12); padding: 0.5rem 0.875rem; font-size: 0.875rem; }
+.header-btn:hover { background: rgba(255,255,255,0.2); }

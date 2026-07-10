@@ -4,22 +4,27 @@ import Dashboard from './components/Dashboard.jsx';
 import TransactionList from './components/TransactionList.jsx';
 import TransactionForm from './components/TransactionForm.jsx';
 import CategoryManager from './components/CategoryManager.jsx';
+import AccountManager from './components/AccountManager.jsx';
+import TransferForm from './components/TransferForm.jsx';
 
 export default function App() {
   const [tab, setTab] = useState('dashboard');
   const [showForm, setShowForm] = useState(false);
-  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [] });
+  const [formMode, setFormMode] = useState('transaction');
+  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [] });
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [{ data: cats }, { data: txs }] = await Promise.all([
+      const [{ data: cats }, { data: accts }, { data: txs }] = await Promise.all([
         supabase.from('categories').select('*').order('type').order('name'),
+        supabase.from('accounts').select('*').order('name'),
         supabase.from('transactions')
-          .select('*, categories(name, color)')
+          .select('*, categories(name, color), accounts(name, color)')
           .order('date', { ascending: false })
           .order('created_at', { ascending: false }),
       ]);
@@ -28,22 +33,36 @@ export default function App() {
         ...t,
         category_name: t.categories?.name,
         category_color: t.categories?.color,
+        account_name: t.accounts?.name,
+        account_color: t.accounts?.color,
       }));
 
-      const income = normalizedTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const expense = normalizedTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const numericTxs = normalizedTxs.map(t => ({ ...t, amount: Number(t.amount) }));
+      const income = numericTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const expense = numericTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
       const catMap = {};
-      normalizedTxs.forEach(t => {
+      numericTxs.forEach(t => {
         const key = `${t.category_id}-${t.type}`;
         if (!catMap[key]) catMap[key] = { name: t.category_name, color: t.category_color, type: t.type, total: 0 };
         catMap[key].total += t.amount;
       });
       const byCategory = Object.values(catMap).sort((a, b) => b.total - a.total);
 
+      const accountMap = {};
+      (accts || []).forEach(a => { accountMap[a.id] = { id: a.id, name: a.name, color: a.color, income: 0, expense: 0, balance: 0 }; });
+      numericTxs.forEach(t => {
+        const accountId = t.account_id || 'unassigned';
+        if (!accountMap[accountId]) accountMap[accountId] = { id: accountId, name: t.account_name || 'Unassigned', color: t.account_color || '#94a3b8', income: 0, expense: 0, balance: 0 };
+        accountMap[accountId][t.type] += t.amount;
+        accountMap[accountId].balance += t.type === 'income' ? t.amount : -t.amount;
+      });
+      const byAccount = Object.values(accountMap).sort((a, b) => b.balance - a.balance);
+
       setCategories(cats || []);
-      setTransactions(normalizedTxs);
-      setSummary({ income, expense, balance: income - expense, byCategory });
+      setAccounts(accts || []);
+      setTransactions(numericTxs);
+      setSummary({ income, expense, balance: income - expense, byCategory, byAccount });
     } finally {
       setLoading(false);
     }
@@ -58,7 +77,20 @@ export default function App() {
       category_id: data.category_id || null,
       description: data.description || null,
       date: data.date,
+      account_id: data.account_id || null,
     });
+    setShowForm(false);
+    fetchAll();
+  };
+
+  const handleAddTransfer = async (data) => {
+    const fromAccount = accounts.find(a => String(a.id) === String(data.from_account_id));
+    const toAccount = accounts.find(a => String(a.id) === String(data.to_account_id));
+    const note = data.description || `Transfer from ${fromAccount?.name || 'account'} to ${toAccount?.name || 'account'}`;
+    await supabase.from('transactions').insert([
+      { amount: data.amount, type: 'expense', category_id: null, account_id: data.from_account_id, description: note, date: data.date },
+      { amount: data.amount, type: 'income', category_id: null, account_id: data.to_account_id, description: note, date: data.date },
+    ]);
     setShowForm(false);
     fetchAll();
   };
@@ -73,9 +105,10 @@ export default function App() {
       <header className="app-header">
         <div className="header-inner">
           <h1 className="logo">€ Money Monitor</h1>
-          <button className="btn btn-primary add-btn" onClick={() => setShowForm(true)}>
-            + Add
-          </button>
+          <div className="header-actions">
+            <button className="btn btn-ghost header-btn" onClick={() => { setFormMode('transfer'); setShowForm(true); }}>Transfer</button>
+            <button className="btn btn-primary add-btn" onClick={() => { setFormMode('transaction'); setShowForm(true); }}>+ Add</button>
+          </div>
         </div>
       </header>
 
@@ -83,6 +116,7 @@ export default function App() {
         {[
           { key: 'dashboard', label: 'Dashboard' },
           { key: 'transactions', label: 'Transactions' },
+          { key: 'accounts', label: 'Accounts' },
           { key: 'categories', label: 'Categories' },
         ].map(({ key, label }) => (
           <button
@@ -107,9 +141,13 @@ export default function App() {
               <TransactionList
                 transactions={transactions}
                 categories={categories}
+                accounts={accounts}
                 onDelete={handleDeleteTransaction}
-                onAdd={() => setShowForm(true)}
+                onAdd={() => { setFormMode('transaction'); setShowForm(true); }}
               />
+            )}
+            {tab === 'accounts' && (
+              <AccountManager accounts={accounts} onRefresh={fetchAll} />
             )}
             {tab === 'categories' && (
               <CategoryManager categories={categories} onRefresh={fetchAll} />
@@ -118,20 +156,25 @@ export default function App() {
         )}
       </main>
 
-      <button className="fab" onClick={() => setShowForm(true)} aria-label="Add Transaction">+</button>
+      <button className="fab" onClick={() => { setFormMode('transaction'); setShowForm(true); }} aria-label="Add Transaction">+</button>
 
       {showForm && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="modal">
             <div className="modal-header">
-              <h2>Add Transaction</h2>
+              <h2>{formMode === 'transfer' ? 'Add Transfer' : 'Add Transaction'}</h2>
               <button className="close-btn" onClick={() => setShowForm(false)}>✕</button>
             </div>
-            <TransactionForm
-              categories={categories}
-              onSubmit={handleAddTransaction}
-              onCancel={() => setShowForm(false)}
-            />
+            {formMode === 'transfer' ? (
+              <TransferForm accounts={accounts} onSubmit={handleAddTransfer} onCancel={() => setShowForm(false)} />
+            ) : (
+              <TransactionForm
+                categories={categories}
+                accounts={accounts}
+                onSubmit={handleAddTransaction}
+                onCancel={() => setShowForm(false)}
+              />
+            )}
           </div>
         </div>
       )}

@@ -21,6 +21,23 @@ export default function Dashboard({ summary, transactions }) {
         </div>
       </div>
 
+      {summary.byAccount?.length > 0 && (
+        <div className="card">
+          <h3 className="section-title">Account Balances</h3>
+          <div className="account-grid">
+            {summary.byAccount.map(account => (
+              <div key={account.id} className="account-card">
+                <span className="cat-dot" style={{ background: account.color }} />
+                <div className="account-card-info">
+                  <span className="account-name">{account.name}</span>
+                  <span className={`account-balance ${account.balance >= 0 ? 'income-color' : 'expense-color'}`}>{fmt(account.balance)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {summary.byCategory.length > 0 && (
         <div className="card">
           <h3 className="section-title">Spending by Category</h3>
@@ -58,7 +75,7 @@ export default function Dashboard({ summary, transactions }) {
                 <div className="tx-dot" style={{ background: tx.category_color || '#94a3b8' }} />
                 <div className="tx-info">
                   <span className="tx-desc">{tx.description || tx.category_name || 'Transaction'}</span>
-                  <span className="tx-meta">{tx.category_name} · {tx.date}</span>
+                  <span className="tx-meta">{tx.account_name || 'No account'} · {tx.category_name || 'Uncategorized'} · {tx.date}</span>
                 </div>
                 <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
                   {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}

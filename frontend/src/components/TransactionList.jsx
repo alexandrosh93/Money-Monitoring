@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-export default function TransactionList({ transactions, categories, onDelete, onAdd }) {
+export default function TransactionList({ transactions, categories, accounts, onDelete, onAdd }) {
   const [filter, setFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('');
+  const [accountFilter, setAccountFilter] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [password, setPassword] = useState('');
   const [pwError, setPwError] = useState(false);
@@ -11,6 +12,7 @@ export default function TransactionList({ transactions, categories, onDelete, on
   const filtered = transactions.filter(tx => {
     if (filter !== 'all' && tx.type !== filter) return false;
     if (catFilter && String(tx.category_id) !== catFilter) return false;
+    if (accountFilter && String(tx.account_id) !== accountFilter) return false;
     return true;
   });
 
@@ -37,6 +39,10 @@ export default function TransactionList({ transactions, categories, onDelete, on
             </button>
           ))}
         </div>
+        <select className="cat-select" value={accountFilter} onChange={e => setAccountFilter(e.target.value)}>
+          <option value="">All accounts</option>
+          {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+        </select>
         <select className="cat-select" value={catFilter} onChange={e => setCatFilter(e.target.value)}>
           <option value="">All categories</option>
           {categories
@@ -57,7 +63,7 @@ export default function TransactionList({ transactions, categories, onDelete, on
               <div className="tx-dot" style={{ background: tx.category_color || '#94a3b8' }} />
               <div className="tx-info">
                 <span className="tx-desc">{tx.description || tx.category_name || 'Transaction'}</span>
-                <span className="tx-meta">{tx.category_name || 'Uncategorized'} · {tx.date}</span>
+                <span className="tx-meta">{tx.account_name || 'No account'} · {tx.category_name || 'Uncategorized'} · {tx.date}</span>
               </div>
               <div className="tx-right">
                 <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
