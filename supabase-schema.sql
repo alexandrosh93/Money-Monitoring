@@ -44,10 +44,20 @@ insert into money_monitor_categories (name, type, color) values
   ('Utilities',    'expense', '#ea580c')
 on conflict (name) do nothing;
 
+-- Rename any previously seeded single-account rows into their Cash sub-account
+-- (safe to run repeatedly: no-op if 'Anna'/'Stelios'/'Alexandros' don't exist)
+update money_monitor_accounts set name = 'Anna - Cash' where name = 'Anna';
+update money_monitor_accounts set name = 'Stelios - Cash' where name = 'Stelios';
+update money_monitor_accounts set name = 'Alexandros - Cash' where name = 'Alexandros';
+
 -- Seed default Money Monitor accounts for separate balances without overwriting existing rows
+-- Anna, Stelios and Alexandros each get a Cash and a Bank sub-account with independent balances
 insert into money_monitor_accounts (name, color) values
   ('Main Pool', '#2563eb'),
-  ('Anna', '#ec4899'),
-  ('Stelios', '#f97316'),
-  ('Alexandros', '#8b5cf6')
+  ('Anna - Cash', '#ec4899'),
+  ('Anna - Bank', '#f472b6'),
+  ('Stelios - Cash', '#f97316'),
+  ('Stelios - Bank', '#fb923c'),
+  ('Alexandros - Cash', '#8b5cf6'),
+  ('Alexandros - Bank', '#a78bfa')
 on conflict (name) do nothing;
