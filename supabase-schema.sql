@@ -30,8 +30,12 @@ create table if not exists money_monitor_transactions (
   account_id  bigint references money_monitor_accounts(id) on delete restrict,
   description text,
   date        date not null,
+  is_transfer boolean not null default false,
   created_at  timestamptz default now()
 );
+
+-- Add is_transfer to transactions created before this feature existed
+alter table money_monitor_transactions add column if not exists is_transfer boolean not null default false;
 
 -- Allow public access for the Money Monitor app only (personal app, no login required)
 alter table money_monitor_accounts     disable row level security;

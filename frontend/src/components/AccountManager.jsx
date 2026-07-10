@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase.js';
+import { IconTrash } from './Icons.jsx';
 
 export default function AccountManager({ accounts, onRefresh }) {
   const [isPersonAccount, setIsPersonAccount] = useState(false);
@@ -114,7 +115,7 @@ export default function AccountManager({ accounts, onRefresh }) {
                   <li key={account.id} className="cat-item">
                     <span className="cat-dot" style={{ background: account.color }} />
                     <span className="cat-name">{account.name}</span>
-                    <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete">✕</button>
+                    <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
                   </li>
                 ))}
               </ul>
@@ -127,7 +128,7 @@ export default function AccountManager({ accounts, onRefresh }) {
                     <li key={account.id} className="cat-item">
                       <span className="cat-dot" style={{ background: account.color }} />
                       <span className="cat-name">{account.kind === 'cash' ? 'Cash' : 'Bank'}</span>
-                      <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete">✕</button>
+                      <button className="delete-btn" onClick={() => handleDelete(account.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
                     </li>
                   ))}
                 </ul>

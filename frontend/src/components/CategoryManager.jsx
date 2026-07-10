@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase.js';
+import { IconTrash } from './Icons.jsx';
 
 export default function CategoryManager({ categories, onRefresh }) {
   const [form, setForm] = useState({ name: '', type: 'expense', color: '#6366f1' });
@@ -33,7 +34,7 @@ export default function CategoryManager({ categories, onRefresh }) {
             <li key={c.id} className="cat-item">
               <span className="cat-dot" style={{ background: c.color }} />
               <span className="cat-name">{c.name}</span>
-              <button className="delete-btn" onClick={() => handleDelete(c.id)} title="Delete">✕</button>
+              <button className="delete-btn" onClick={() => handleDelete(c.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
             </li>
           ))}
         </ul>

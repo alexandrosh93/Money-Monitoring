@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IconArrowUp, IconArrowDown, IconSwap, IconTrash, IconEmpty } from './Icons.jsx';
 
 export default function TransactionList({ transactions, categories, accounts, onDelete, onAdd }) {
   const [filter, setFilter] = useState('all');
@@ -39,37 +40,44 @@ export default function TransactionList({ transactions, categories, accounts, on
             </button>
           ))}
         </div>
-        <select className="cat-select" value={accountFilter} onChange={e => setAccountFilter(e.target.value)}>
-          <option value="">All accounts</option>
-          {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-        </select>
-        <select className="cat-select" value={catFilter} onChange={e => setCatFilter(e.target.value)}>
-          <option value="">All categories</option>
-          {categories
-            .filter(c => filter === 'all' || c.type === filter)
-            .map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <div className="filter-selects">
+          <select className="cat-select" value={accountFilter} onChange={e => setAccountFilter(e.target.value)}>
+            <option value="">All accounts</option>
+            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+          <select className="cat-select" value={catFilter} onChange={e => setCatFilter(e.target.value)}>
+            <option value="">All categories</option>
+            {categories
+              .filter(c => filter === 'all' || c.type === filter)
+              .map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
         <div className="card empty-card">
-          <p className="empty-state">No transactions found.</p>
+          <span className="empty-icon"><IconEmpty /></span>
+          <p className="empty-state" style={{ padding: 0 }}>No transactions found.</p>
           <button className="btn btn-primary" onClick={onAdd}>+ Add Transaction</button>
         </div>
       ) : (
         <ul className="tx-list card">
           {filtered.map(tx => (
             <li key={tx.id} className="tx-item">
-              <div className="tx-dot" style={{ background: tx.category_color || '#94a3b8' }} />
+              <span className={`tx-icon ${tx.is_transfer ? 'transfer' : tx.type}`}>
+                {tx.is_transfer ? <IconSwap size={16} /> : tx.type === 'income' ? <IconArrowUp size={16} /> : <IconArrowDown size={16} />}
+              </span>
               <div className="tx-info">
                 <span className="tx-desc">{tx.description || tx.category_name || 'Transaction'}</span>
-                <span className="tx-meta">{tx.account_name || 'No account'} · {tx.category_name || 'Uncategorized'} · {tx.date}</span>
+                <span className="tx-meta">{tx.account_name || 'No account'} · {tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
               </div>
               <div className="tx-right">
                 <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
                   {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                 </span>
-                <button className="delete-btn" onClick={() => openDelete(tx.id)} title="Delete">✕</button>
+                <button className="delete-btn" onClick={() => openDelete(tx.id)} title="Delete" aria-label="Delete">
+                  <IconTrash size={15} />
+                </button>
               </div>
             </li>
           ))}

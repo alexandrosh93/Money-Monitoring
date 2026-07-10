@@ -6,6 +6,14 @@ import TransactionForm from './components/TransactionForm.jsx';
 import CategoryManager from './components/CategoryManager.jsx';
 import AccountManager from './components/AccountManager.jsx';
 import TransferForm from './components/TransferForm.jsx';
+import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose } from './components/Icons.jsx';
+
+const TABS = [
+  { key: 'dashboard', label: 'Home', Icon: IconHome },
+  { key: 'transactions', label: 'History', Icon: IconList },
+  { key: 'accounts', label: 'Accounts', Icon: IconWallet },
+  { key: 'categories', label: 'Categories', Icon: IconTag },
+];
 
 export default function App() {
   const [tab, setTab] = useState('dashboard');
@@ -38,11 +46,12 @@ export default function App() {
       }));
 
       const numericTxs = normalizedTxs.map(t => ({ ...t, amount: Number(t.amount) }));
-      const income = numericTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const expense = numericTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const realTxs = numericTxs.filter(t => !t.is_transfer);
+      const income = realTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const expense = realTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
       const catMap = {};
-      numericTxs.forEach(t => {
+      realTxs.forEach(t => {
         const key = `${t.category_id}-${t.type}`;
         if (!catMap[key]) catMap[key] = { name: t.category_name, color: t.category_color, type: t.type, total: 0 };
         catMap[key].total += t.amount;
@@ -98,8 +107,8 @@ export default function App() {
     const toAccount = accounts.find(a => String(a.id) === String(data.to_account_id));
     const note = data.description || `Transfer from ${fromAccount?.name || 'account'} to ${toAccount?.name || 'account'}`;
     await supabase.from('money_monitor_transactions').insert([
-      { amount: data.amount, type: 'expense', category_id: null, account_id: data.from_account_id, description: note, date: data.date },
-      { amount: data.amount, type: 'income', category_id: null, account_id: data.to_account_id, description: note, date: data.date },
+      { amount: data.amount, type: 'expense', category_id: null, account_id: data.from_account_id, description: note, date: data.date, is_transfer: true },
+      { amount: data.amount, type: 'income', category_id: null, account_id: data.to_account_id, description: note, date: data.date, is_transfer: true },
     ]);
     setShowForm(false);
     fetchAll();
@@ -114,34 +123,25 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-inner">
-          <h1 className="logo">€ Money Monitor</h1>
+          <h1 className="logo">
+            <span className="logo-badge"><IconEuro size={18} /></span>
+            Money Monitor
+          </h1>
           <div className="header-actions">
-            <button className="btn btn-ghost header-btn" onClick={() => { setFormMode('transfer'); setShowForm(true); }}>Transfer</button>
-            <button className="btn btn-primary add-btn" onClick={() => { setFormMode('transaction'); setShowForm(true); }}>+ Add</button>
+            <button className="btn btn-ghost header-btn" onClick={() => { setFormMode('transfer'); setShowForm(true); }}>
+              <IconSwap size={16} /> Transfer
+            </button>
           </div>
         </div>
       </header>
 
-      <nav className="tab-nav">
-        {[
-          { key: 'dashboard', label: 'Dashboard' },
-          { key: 'transactions', label: 'Transactions' },
-          { key: 'accounts', label: 'Accounts' },
-          { key: 'categories', label: 'Categories' },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            className={`tab-btn ${tab === key ? 'active' : ''}`}
-            onClick={() => setTab(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-
       <main className="main-content">
         {loading ? (
-          <div className="loading">Loading...</div>
+          <div className="loading">
+            <div className="skeleton" style={{ height: 96 }} />
+            <div className="skeleton" style={{ height: 140 }} />
+            <div className="skeleton" style={{ height: 180 }} />
+          </div>
         ) : (
           <>
             {tab === 'dashboard' && (
@@ -166,14 +166,30 @@ export default function App() {
         )}
       </main>
 
-      <button className="fab" onClick={() => { setFormMode('transaction'); setShowForm(true); }} aria-label="Add Transaction">+</button>
+      <button className="fab" onClick={() => { setFormMode('transaction'); setShowForm(true); }} aria-label="Add Transaction">
+        <IconPlus size={26} />
+      </button>
+
+      <nav className="tab-nav">
+        {TABS.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            className={`tab-btn ${tab === key ? 'active' : ''}`}
+            onClick={() => setTab(key)}
+          >
+            <span className="tab-icon"><Icon size={21} /></span>
+            {label}
+          </button>
+        ))}
+      </nav>
 
       {showForm && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="modal">
+            <div className="modal-handle" />
             <div className="modal-header">
               <h2>{formMode === 'transfer' ? 'Add Transfer' : 'Add Transaction'}</h2>
-              <button className="close-btn" onClick={() => setShowForm(false)}>✕</button>
+              <button className="close-btn" onClick={() => setShowForm(false)} aria-label="Close"><IconClose size={16} /></button>
             </div>
             {formMode === 'transfer' ? (
               <TransferForm accounts={accounts} onSubmit={handleAddTransfer} onCancel={() => setShowForm(false)} />

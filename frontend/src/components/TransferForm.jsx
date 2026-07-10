@@ -11,9 +11,9 @@ export default function TransferForm({ accounts, onSubmit, onCancel }) {
 
   return (
     <form className="tx-form" onSubmit={handleSubmit}>
-      <div className="form-group">
+      <div className="form-group amount-group">
         <label>Amount</label>
-        <input type="number" min="0.01" step="0.01" placeholder="0.00" required
+        <input type="number" min="0.01" step="0.01" placeholder="0.00" required inputMode="decimal"
           value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
       </div>
 
