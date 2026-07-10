@@ -113,7 +113,7 @@ export default function Dashboard({ summary, transactions }) {
                   <span className="tx-desc">{tx.description || tx.category_name || 'Transaction'}</span>
                   <span className="tx-meta">{tx.account_name || 'No account'} · {tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
                 </div>
-                <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
+                <span className={`tx-amount ${tx.is_transfer ? 'transfer-color' : (tx.type === 'income' ? 'income-color' : 'expense-color')}`}>
                   {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                 </span>
               </li>

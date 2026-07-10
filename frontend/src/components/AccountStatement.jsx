@@ -52,7 +52,7 @@ export default function AccountStatement({ account, transactions, onClose }) {
                   <span className="tx-meta">{tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
                 </div>
                 <div className="statement-amounts">
-                  <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
+                  <span className={`tx-amount ${tx.is_transfer ? 'transfer-color' : (tx.type === 'income' ? 'income-color' : 'expense-color')}`}>
                     {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                   </span>
                   <span className="statement-running">{fmt(tx.balanceAfter)}</span>

@@ -72,7 +72,7 @@ export default function TransactionList({ transactions, categories, accounts, on
                 <span className="tx-meta">{tx.account_name || 'No account'} · {tx.is_transfer ? 'Transfer' : (tx.category_name || 'Uncategorized')} · {tx.date}</span>
               </div>
               <div className="tx-right">
-                <span className={`tx-amount ${tx.type === 'income' ? 'income-color' : 'expense-color'}`}>
+                <span className={`tx-amount ${tx.is_transfer ? 'transfer-color' : (tx.type === 'income' ? 'income-color' : 'expense-color')}`}>
                   {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                 </span>
                 <button className="delete-btn" onClick={() => openDelete(tx.id)} title="Delete" aria-label="Delete">
