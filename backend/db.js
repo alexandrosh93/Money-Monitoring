@@ -10,7 +10,14 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS categories (
+  CREATE TABLE IF NOT EXISTS money_monitor_accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    color TEXT NOT NULL DEFAULT '#2563eb',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS money_monitor_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
@@ -18,22 +25,44 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
-  CREATE TABLE IF NOT EXISTS transactions (
+  CREATE TABLE IF NOT EXISTS money_monitor_transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     amount REAL NOT NULL CHECK(amount > 0),
     type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
     category_id INTEGER,
+    account_id INTEGER,
     description TEXT,
     date TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+    FOREIGN KEY (category_id) REFERENCES money_monitor_categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (account_id) REFERENCES money_monitor_accounts(id) ON DELETE RESTRICT
   );
 `);
 
-// Seed default categories if empty
-const count = db.prepare('SELECT COUNT(*) as c FROM categories').get();
+const txColumns = db.prepare("PRAGMA table_info(money_monitor_transactions)").all().map(column => column.name);
+if (!txColumns.includes('account_id')) {
+  db.exec('ALTER TABLE money_monitor_transactions ADD COLUMN account_id INTEGER REFERENCES money_monitor_accounts(id) ON DELETE RESTRICT');
+}
+
+// Seed default money_monitor_accounts if empty
+const accountCount = db.prepare('SELECT COUNT(*) as c FROM money_monitor_accounts').get();
+if (accountCount.c === 0) {
+  const insertAccount = db.prepare('INSERT INTO money_monitor_accounts (name, color) VALUES (?, ?)');
+  const seedAccounts = db.transaction(() => {
+    [
+      ['Main Pool', '#2563eb'],
+      ['Anna', '#ec4899'],
+      ['Stelios', '#f97316'],
+      ['Alexandros', '#8b5cf6'],
+    ].forEach(([name, color]) => insertAccount.run(name, color));
+  });
+  seedAccounts();
+}
+
+// Seed default money_monitor_categories if empty
+const count = db.prepare('SELECT COUNT(*) as c FROM money_monitor_categories').get();
 if (count.c === 0) {
-  const insert = db.prepare('INSERT INTO categories (name, type, color) VALUES (?, ?, ?)');
+  const insert = db.prepare('INSERT INTO money_monitor_categories (name, type, color) VALUES (?, ?, ?)');
   const seedCategories = db.transaction(() => {
     [
       ['Salary', 'income', '#22c55e'],
