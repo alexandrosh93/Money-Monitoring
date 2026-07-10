@@ -11,7 +11,7 @@ export default function App() {
   const [tab, setTab] = useState('dashboard');
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState('transaction');
-  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [] });
+  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [], byPerson: [] });
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -50,19 +50,29 @@ export default function App() {
       const byCategory = Object.values(catMap).sort((a, b) => b.total - a.total);
 
       const accountMap = {};
-      (accts || []).forEach(a => { accountMap[a.id] = { id: a.id, name: a.name, color: a.color, income: 0, expense: 0, balance: 0 }; });
+      (accts || []).forEach(a => { accountMap[a.id] = { id: a.id, name: a.name, color: a.color, group_name: a.group_name, kind: a.kind, income: 0, expense: 0, balance: 0 }; });
       numericTxs.forEach(t => {
         const accountId = t.account_id || 'unassigned';
-        if (!accountMap[accountId]) accountMap[accountId] = { id: accountId, name: t.account_name || 'Unassigned', color: t.account_color || '#94a3b8', income: 0, expense: 0, balance: 0 };
+        if (!accountMap[accountId]) accountMap[accountId] = { id: accountId, name: t.account_name || 'Unassigned', color: t.account_color || '#94a3b8', group_name: null, kind: null, income: 0, expense: 0, balance: 0 };
         accountMap[accountId][t.type] += t.amount;
         accountMap[accountId].balance += t.type === 'income' ? t.amount : -t.amount;
       });
-      const byAccount = Object.values(accountMap).sort((a, b) => b.balance - a.balance);
+      const allAccounts = Object.values(accountMap);
+      const byAccount = allAccounts.filter(a => !a.group_name).sort((a, b) => b.balance - a.balance);
+
+      const personMap = {};
+      allAccounts.filter(a => a.group_name).forEach(a => {
+        if (!personMap[a.group_name]) personMap[a.group_name] = { name: a.group_name, cash: 0, bank: 0, total: 0 };
+        if (a.kind === 'cash') personMap[a.group_name].cash += a.balance;
+        if (a.kind === 'bank') personMap[a.group_name].bank += a.balance;
+        personMap[a.group_name].total += a.balance;
+      });
+      const byPerson = Object.values(personMap).sort((a, b) => b.total - a.total);
 
       setCategories(cats || []);
       setAccounts(accts || []);
       setTransactions(numericTxs);
-      setSummary({ income, expense, balance: income - expense, byCategory, byAccount });
+      setSummary({ income, expense, balance: income - expense, byCategory, byAccount, byPerson });
     } finally {
       setLoading(false);
     }

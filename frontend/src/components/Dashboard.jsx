@@ -38,6 +38,26 @@ export default function Dashboard({ summary, transactions }) {
         </div>
       )}
 
+      {summary.byPerson?.length > 0 && (
+        <div className="card">
+          <h3 className="section-title">Balances by Person</h3>
+          <div className="person-grid">
+            {summary.byPerson.map(person => (
+              <div key={person.name} className="person-card">
+                <div className="person-header">
+                  <span className="person-name">{person.name}</span>
+                  <span className={`person-total ${person.total >= 0 ? 'income-color' : 'expense-color'}`}>{fmt(person.total)}</span>
+                </div>
+                <div className="person-breakdown">
+                  <span>Cash: <strong>{fmt(person.cash)}</strong></span>
+                  <span>Bank: <strong>{fmt(person.bank)}</strong></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {summary.byCategory.length > 0 && (
         <div className="card">
           <h3 className="section-title">Spending by Category</h3>

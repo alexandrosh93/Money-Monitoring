@@ -5,8 +5,14 @@ create table if not exists money_monitor_accounts (
   id         bigint primary key generated always as identity,
   name       text not null unique,
   color      text not null default '#2563eb',
+  group_name text,
+  kind       text check (kind in ('cash', 'bank')),
   created_at timestamptz default now()
 );
+
+-- Add group_name/kind to accounts created before this feature existed
+alter table money_monitor_accounts add column if not exists group_name text;
+alter table money_monitor_accounts add column if not exists kind text check (kind in ('cash', 'bank'));
 
 create table if not exists money_monitor_categories (
   id         bigint primary key generated always as identity,
@@ -51,13 +57,22 @@ update money_monitor_accounts set name = 'Stelios - Cash' where name = 'Stelios'
 update money_monitor_accounts set name = 'Alexandros - Cash' where name = 'Alexandros';
 
 -- Seed default Money Monitor accounts for separate balances without overwriting existing rows
--- Anna, Stelios and Alexandros each get a Cash and a Bank sub-account with independent balances
-insert into money_monitor_accounts (name, color) values
-  ('Main Pool', '#2563eb'),
-  ('Anna - Cash', '#ec4899'),
-  ('Anna - Bank', '#f472b6'),
-  ('Stelios - Cash', '#f97316'),
-  ('Stelios - Bank', '#fb923c'),
-  ('Alexandros - Cash', '#8b5cf6'),
-  ('Alexandros - Bank', '#a78bfa')
+-- Anna, Stelios and Alexandros each get a Cash and a Bank sub-account with independent balances,
+-- grouped under group_name so the app can show a combined total per person plus the breakdown
+insert into money_monitor_accounts (name, color, group_name, kind) values
+  ('Main Pool', '#2563eb', null, null),
+  ('Anna - Cash', '#ec4899', 'Anna', 'cash'),
+  ('Anna - Bank', '#f472b6', 'Anna', 'bank'),
+  ('Stelios - Cash', '#f97316', 'Stelios', 'cash'),
+  ('Stelios - Bank', '#fb923c', 'Stelios', 'bank'),
+  ('Alexandros - Cash', '#8b5cf6', 'Alexandros', 'cash'),
+  ('Alexandros - Bank', '#a78bfa', 'Alexandros', 'bank')
 on conflict (name) do nothing;
+
+-- Backfill group_name/kind for accounts inserted before this feature existed
+update money_monitor_accounts set group_name = 'Anna', kind = 'cash' where name = 'Anna - Cash' and group_name is null;
+update money_monitor_accounts set group_name = 'Anna', kind = 'bank' where name = 'Anna - Bank' and group_name is null;
+update money_monitor_accounts set group_name = 'Stelios', kind = 'cash' where name = 'Stelios - Cash' and group_name is null;
+update money_monitor_accounts set group_name = 'Stelios', kind = 'bank' where name = 'Stelios - Bank' and group_name is null;
+update money_monitor_accounts set group_name = 'Alexandros', kind = 'cash' where name = 'Alexandros - Cash' and group_name is null;
+update money_monitor_accounts set group_name = 'Alexandros', kind = 'bank' where name = 'Alexandros - Bank' and group_name is null;

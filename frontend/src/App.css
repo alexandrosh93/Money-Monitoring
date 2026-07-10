@@ -155,6 +155,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .account-name { font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .account-balance { font-weight: 700; font-size: 1.125rem; }
 .helper-text { color: var(--muted); font-size: 0.875rem; margin: -0.5rem 0 1rem; line-height: 1.4; }
+
+/* Balances by person */
+.person-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+@media (min-width: 560px) { .person-grid { grid-template-columns: 1fr 1fr; } }
+.person-card { border: 1px solid var(--border); border-radius: 10px; background: #f8fafc; padding: 0.875rem; }
+.person-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.person-name { font-weight: 600; font-size: 0.9375rem; }
+.person-total { font-weight: 700; font-size: 1.125rem; }
+.person-breakdown { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--muted); }
+.person-breakdown strong { color: var(--text); font-weight: 600; }
+.account-group { margin-top: 1rem; }
+.account-group-title { font-size: 0.8125rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.375rem; }
 .header-actions { display: flex; align-items: center; gap: 0.5rem; }
 .header-btn { color: white; background: rgba(255,255,255,0.12); padding: 0.5rem 0.875rem; font-size: 0.875rem; }
 .header-btn:hover { background: rgba(255,255,255,0.2); }
