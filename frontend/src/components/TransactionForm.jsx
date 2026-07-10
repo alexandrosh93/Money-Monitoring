@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export default function TransactionForm({ categories, onSubmit, onCancel }) {
+export default function TransactionForm({ categories, accounts, onSubmit, onCancel }) {
   const today = new Date().toISOString().split('T')[0];
-  const [form, setForm] = useState({ amount: '', type: 'expense', category_id: '', description: '', date: today });
+  const [form, setForm] = useState({ amount: '', type: 'expense', category_id: '', account_id: '', description: '', date: today });
   const filtered = categories.filter(c => c.type === form.type);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export default function TransactionForm({ categories, onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ ...form, amount: parseFloat(form.amount), category_id: form.category_id || null });
+    onSubmit({ ...form, amount: parseFloat(form.amount), category_id: form.category_id || null, account_id: form.account_id || null });
   };
 
   return (
@@ -27,6 +27,14 @@ export default function TransactionForm({ categories, onSubmit, onCancel }) {
         <label>Amount</label>
         <input type="number" min="0.01" step="0.01" placeholder="0.00" required
           value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+      </div>
+
+      <div className="form-group">
+        <label>Account</label>
+        <select required value={form.account_id} onChange={e => setForm(f => ({ ...f, account_id: e.target.value }))}>
+          <option value="">-- Select account --</option>
+          {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+        </select>
       </div>
 
       <div className="form-group">

@@ -11,7 +11,7 @@ export default function CategoryManager({ categories, onRefresh }) {
   const handleAdd = async (e) => {
     e.preventDefault();
     setError('');
-    const { error: err } = await supabase.from('categories').insert({
+    const { error: err } = await supabase.from('money_monitor_categories').insert({
       name: form.name.trim(), type: form.type, color: form.color,
     });
     if (err) { setError(err.message); return; }
@@ -20,7 +20,7 @@ export default function CategoryManager({ categories, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    await supabase.from('categories').delete().eq('id', id);
+    await supabase.from('money_monitor_categories').delete().eq('id', id);
     onRefresh();
   };
 
