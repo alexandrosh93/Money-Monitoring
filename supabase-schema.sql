@@ -80,3 +80,12 @@ update money_monitor_accounts set group_name = 'Stelios', kind = 'cash' where na
 update money_monitor_accounts set group_name = 'Stelios', kind = 'bank' where name = 'Stelios - Bank' and group_name is null;
 update money_monitor_accounts set group_name = 'Alexandros', kind = 'cash' where name = 'Alexandros - Cash' and group_name is null;
 update money_monitor_accounts set group_name = 'Alexandros', kind = 'bank' where name = 'Alexandros - Bank' and group_name is null;
+
+-- Split Alexandros's single Bank account into two named bank sub-accounts.
+-- (safe to run repeatedly: renames the old row once, then only inserts the one that's missing)
+update money_monitor_accounts set name = 'Alexandros - Bank of Cyprus' where name = 'Alexandros - Bank';
+
+insert into money_monitor_accounts (name, color, group_name, kind) values
+  ('Alexandros - Bank of Cyprus', '#a78bfa', 'Alexandros', 'bank'),
+  ('Alexandros - Eurobank', '#c4b5fd', 'Alexandros', 'bank')
+on conflict (name) do nothing;

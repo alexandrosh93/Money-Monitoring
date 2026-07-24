@@ -8,6 +8,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
   const [name, setName] = useState('');
   const [personName, setPersonName] = useState('');
   const [kind, setKind] = useState('cash');
+  const [bankName, setBankName] = useState('');
   const [color, setColor] = useState('#2563eb');
   const [error, setError] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -22,6 +23,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
     setName('');
     setPersonName('');
     setKind('cash');
+    setBankName('');
     setColor('#2563eb');
   };
 
@@ -29,9 +31,10 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
     e.preventDefault();
     setError('');
 
+    const subLabel = kind === 'cash' ? 'Cash' : (bankName.trim() || 'Bank');
     const payload = isPersonAccount
       ? {
-          name: `${personName.trim()} - ${kind === 'cash' ? 'Cash' : 'Bank'}`,
+          name: `${personName.trim()} - ${subLabel}`,
           color,
           group_name: personName.trim(),
           kind,
@@ -76,7 +79,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
     <div className="account-page">
       <div className="card">
         <h3 className="section-title">Add Account</h3>
-        <p className="helper-text">Use a standalone account for pools like Main Pool, or a person sub-account (Cash / Bank) for Anna, Stelios, Alexandros, etc.</p>
+        <p className="helper-text">Use a standalone account for pools like Main Pool, or a person sub-account (Cash, or Bank with an optional bank name like "Bank of Cyprus") for Anna, Stelios, Alexandros, etc. Add multiple Bank sub-accounts per person to track different banks separately.</p>
         <form className="cat-form" onSubmit={handleAdd}>
           <div className="type-toggle">
             <button type="button" className={`toggle-btn ${!isPersonAccount ? 'active-income' : ''}`}
@@ -107,6 +110,13 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
                     onClick={() => setKind('bank')}>Bank</button>
                 </div>
               </div>
+              {kind === 'bank' && (
+                <div className="form-group">
+                  <label>Bank Name (optional)</label>
+                  <input type="text" placeholder="e.g. Bank of Cyprus, Eurobank" maxLength={50}
+                    value={bankName} onChange={e => setBankName(e.target.value)} />
+                </div>
+              )}
             </>
           ) : (
             <div className="form-row">
@@ -144,7 +154,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
                 <h4 className="account-group-title">{person}</h4>
                 <ul className="cat-list">
                   {accts.map(account => (
-                    <AccountRow key={account.id} account={account} label={account.kind === 'cash' ? 'Cash' : 'Bank'} />
+                    <AccountRow key={account.id} account={account} label={account.name.split(' - ').slice(1).join(' - ') || account.name} />
                   ))}
                 </ul>
               </div>
