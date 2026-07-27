@@ -6,7 +6,8 @@ import TransactionForm from './components/TransactionForm.jsx';
 import CategoryManager from './components/CategoryManager.jsx';
 import AccountManager from './components/AccountManager.jsx';
 import TransferForm from './components/TransferForm.jsx';
-import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose } from './components/Icons.jsx';
+import Login from './components/Login.jsx';
+import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose, IconLogout } from './components/Icons.jsx';
 
 const TABS = [
   { key: 'dashboard', label: 'Home', Icon: IconHome },
@@ -16,6 +17,7 @@ const TABS = [
 ];
 
 export default function App() {
+  const [session, setSession] = useState(undefined);
   const [tab, setTab] = useState('dashboard');
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState('transaction');
@@ -24,6 +26,14 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -92,7 +102,11 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { if (session) fetchAll(); }, [session, fetchAll]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const handleAddTransaction = async (data) => {
     await supabase.from('money_monitor_transactions').insert({
@@ -140,6 +154,14 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
+  if (session === undefined) {
+    return <div className="auth-check" />;
+  }
+
+  if (!session) {
+    return <Login />;
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -151,6 +173,9 @@ export default function App() {
           <div className="header-actions">
             <button className="btn btn-ghost header-btn" onClick={() => { setFormMode('transfer'); setShowForm(true); }}>
               <IconSwap size={16} /> Transfer
+            </button>
+            <button className="btn btn-ghost header-icon-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
+              <IconLogout size={16} />
             </button>
           </div>
         </div>

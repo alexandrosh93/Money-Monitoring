@@ -106,6 +106,14 @@ export const IconDownload = ({ size = 18 }) => (
   </svg>
 );
 
+export const IconLogout = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" />
+    <path d="M15 16l4-4-4-4" />
+    <path d="M19 12H9" />
+  </svg>
+);
+
 export const IconEmpty = ({ size = 40 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <rect x="3" y="6" width="18" height="13" rx="2" />

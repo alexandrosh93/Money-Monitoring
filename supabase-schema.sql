@@ -1,5 +1,7 @@
 -- Run this in your Supabase project: Dashboard → SQL Editor → New query → paste → Run
 -- This app uses money_monitor_* table names so it does not touch Anna's or any other project's tables.
+-- After running this, also create the login user manually in the Supabase Dashboard:
+-- Authentication → Users → Add user → enter the app's email/password → confirm the email.
 
 create table if not exists money_monitor_accounts (
   id         bigint primary key generated always as identity,
@@ -37,10 +39,23 @@ create table if not exists money_monitor_transactions (
 -- Add is_transfer to transactions created before this feature existed
 alter table money_monitor_transactions add column if not exists is_transfer boolean not null default false;
 
--- Allow public access for the Money Monitor app only (personal app, no login required)
-alter table money_monitor_accounts     disable row level security;
-alter table money_monitor_categories   disable row level security;
-alter table money_monitor_transactions disable row level security;
+-- Require a signed-in session for all access to the Money Monitor tables.
+-- The app now has a login screen; only authenticated requests are allowed
+-- through, so the public anon key alone can no longer read or write anything.
+alter table money_monitor_accounts     enable row level security;
+alter table money_monitor_categories   enable row level security;
+alter table money_monitor_transactions enable row level security;
+
+drop policy if exists "Authenticated access" on money_monitor_accounts;
+drop policy if exists "Authenticated access" on money_monitor_categories;
+drop policy if exists "Authenticated access" on money_monitor_transactions;
+
+create policy "Authenticated access" on money_monitor_accounts
+  for all to authenticated using (true) with check (true);
+create policy "Authenticated access" on money_monitor_categories
+  for all to authenticated using (true) with check (true);
+create policy "Authenticated access" on money_monitor_transactions
+  for all to authenticated using (true) with check (true);
 
 -- Seed default Money Monitor categories without overwriting existing rows
 insert into money_monitor_categories (name, type, color) values
