@@ -166,7 +166,7 @@ export default function App() {
             Money Monitor
           </h1>
           <div className="header-actions">
-            <button className="btn btn-ghost header-icon-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
+            <button className="btn btn-ghost header-icon-btn header-signout-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
               <IconLogout size={16} />
             </button>
           </div>
