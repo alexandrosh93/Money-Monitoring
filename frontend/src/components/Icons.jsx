@@ -114,6 +114,19 @@ export const IconLogout = ({ size = 18 }) => (
   </svg>
 );
 
+export const IconSun = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <circle cx="12" cy="12" r="4.5" />
+    <path d="M12 2.5v2.5M12 19v2.5M4.5 12H2M22 12h-2.5M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8" />
+  </svg>
+);
+
+export const IconMoon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5Z" />
+  </svg>
+);
+
 export const IconEmpty = ({ size = 40 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <rect x="3" y="6" width="18" height="13" rx="2" />

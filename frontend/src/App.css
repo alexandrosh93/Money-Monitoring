@@ -35,7 +35,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --primary: #3b82f6;
     --primary-dark: #2563eb;
     --primary-light: rgba(59,130,246,0.16);
@@ -58,6 +58,30 @@
     --shadow-md: 0 10px 28px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.28);
     --shadow-lg: 0 24px 60px rgba(0,0,0,0.6);
   }
+}
+
+:root[data-theme="dark"] {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: rgba(59,130,246,0.16);
+  --income: #4ade80;
+  --income-bg: rgba(74,222,128,0.14);
+  --expense: #f87171;
+  --expense-bg: rgba(248,113,113,0.14);
+  --cash: #2dd4bf;
+  --cash-bg: rgba(45,212,191,0.14);
+  --bank: #a78bfa;
+  --bank-bg: rgba(167,139,250,0.16);
+  --bg: #090e1a;
+  --card: #121b2e;
+  --card-rgb: 18, 27, 46;
+  --card-alt: #182338;
+  --text: #e8edf7;
+  --muted: #8b97ac;
+  --border: #253148;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.24);
+  --shadow-md: 0 10px 28px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.28);
+  --shadow-lg: 0 24px 60px rgba(0,0,0,0.6);
 }
 
 html { -webkit-tap-highlight-color: transparent; }

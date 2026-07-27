@@ -7,7 +7,7 @@ import CategoryManager from './components/CategoryManager.jsx';
 import AccountManager from './components/AccountManager.jsx';
 import TransferForm from './components/TransferForm.jsx';
 import Login from './components/Login.jsx';
-import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose, IconLogout } from './components/Icons.jsx';
+import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose, IconLogout, IconSun, IconMoon } from './components/Icons.jsx';
 
 const LEFT_TABS = [
   { key: 'dashboard', label: 'Home', Icon: IconHome },
@@ -29,6 +29,18 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState(() => {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -166,6 +178,9 @@ export default function App() {
             Money Monitor
           </h1>
           <div className="header-actions">
+            <button className="btn btn-ghost header-icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle light/dark">
+              {theme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
+            </button>
             <button className="btn btn-ghost header-icon-btn header-signout-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
               <IconLogout size={16} />
             </button>
