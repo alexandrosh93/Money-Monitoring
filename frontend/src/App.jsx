@@ -181,7 +181,7 @@ export default function App() {
             <button className="btn btn-ghost header-icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle light/dark">
               {theme === 'dark' ? <IconSun size={16} /> : <IconMoon size={16} />}
             </button>
-            <button className="btn btn-ghost header-icon-btn header-signout-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
+            <button className="btn header-icon-btn header-signout-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
               <IconLogout size={16} />
             </button>
           </div>
