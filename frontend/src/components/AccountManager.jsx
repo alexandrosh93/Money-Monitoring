@@ -65,7 +65,7 @@ export default function AccountManager({ accounts, transactions, onRefresh, onEx
   }, {});
 
   const AccountRow = ({ account, label }) => (
-    <li className="cat-item account-row" onClick={() => setSelectedAccount(account)}>
+    <li className="cat-item account-row" style={{ borderLeftColor: account.color }} onClick={() => setSelectedAccount(account)}>
       <span className="cat-dot" style={{ background: account.color }} />
       <span className="cat-name">{label}</span>
       <span className={`account-balance-mini ${balanceFor(account.id) >= 0 ? 'income-color' : 'expense-color'}`}>

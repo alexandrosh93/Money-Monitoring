@@ -56,6 +56,7 @@ export default function Dashboard({ summary, transactions }) {
               <div
                 key={person.name}
                 className="person-card clickable"
+                style={{ borderLeftColor: 'var(--primary)' }}
                 onClick={() => setStatementTarget({ title: person.name, color: 'var(--primary)', accountIds: person.accountIds })}
               >
                 <div className="person-header">
@@ -85,6 +86,7 @@ export default function Dashboard({ summary, transactions }) {
               <div
                 key={account.id}
                 className="account-card clickable"
+                style={{ borderLeftColor: account.color }}
                 onClick={() => setStatementTarget({ title: account.name, color: account.color, accountIds: [account.id] })}
               >
                 <span className="cat-dot" style={{ background: account.color }} />

@@ -34,7 +34,7 @@ export default function CategoryManager({ categories, onRefresh }) {
       {cats.length === 0 ? <p className="empty-state">No categories yet.</p> : (
         <ul className="cat-list">
           {cats.map(c => (
-            <li key={c.id} className="cat-item">
+            <li key={c.id} className="cat-item" style={{ borderLeftColor: c.color }}>
               <span className="cat-dot" style={{ background: c.color }} />
               <span className="cat-name">{c.name}</span>
               <button className="delete-btn" onClick={() => setDeleteTarget(c)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
