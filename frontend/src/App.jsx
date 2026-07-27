@@ -246,7 +246,7 @@ export default function App() {
                 onClick={() => { setFormMode('transaction'); setShowForm(true); setShowActionMenu(false); }}
               >
                 <span className="action-menu-icon transaction"><IconPlus size={22} /></span>
-                <span>Add Transaction</span>
+                <span>Add Income or Expense</span>
               </button>
               <button
                 className="action-menu-item"
@@ -265,7 +265,7 @@ export default function App() {
           <div className="modal">
             <div className="modal-handle" />
             <div className="modal-header">
-              <h2>{formMode === 'transfer' ? 'Add Transfer' : 'Add Transaction'}</h2>
+              <h2>{formMode === 'transfer' ? 'Add Transfer' : 'Add Income or Expense'}</h2>
               <button className="close-btn" onClick={() => setShowForm(false)} aria-label="Close"><IconClose size={16} /></button>
             </div>
             {formMode === 'transfer' ? (

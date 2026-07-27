@@ -47,7 +47,7 @@ export default function TransactionList({ transactions, categories, accounts, on
         <div className="card empty-card">
           <span className="empty-icon"><IconEmpty /></span>
           <p className="empty-state" style={{ padding: 0 }}>No transactions found.</p>
-          <button className="btn btn-primary" onClick={onAdd}>+ Add Transaction</button>
+          <button className="btn btn-primary" onClick={onAdd}>+ Add Income or Expense</button>
         </div>
       ) : (
         <ul className="tx-list card">
