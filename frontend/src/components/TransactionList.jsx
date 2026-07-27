@@ -10,7 +10,9 @@ export default function TransactionList({ transactions, categories, accounts, on
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
 
   const filtered = transactions.filter(tx => {
-    if (filter !== 'all' && tx.type !== filter) return false;
+    if (filter === 'income' && (tx.type !== 'income' || tx.is_transfer)) return false;
+    if (filter === 'expense' && (tx.type !== 'expense' || tx.is_transfer)) return false;
+    if (filter === 'transfer' && !tx.is_transfer) return false;
     if (catFilter && String(tx.category_id) !== catFilter) return false;
     if (accountFilter && String(tx.account_id) !== accountFilter) return false;
     return true;
@@ -20,7 +22,7 @@ export default function TransactionList({ transactions, categories, accounts, on
     <div className="tx-page">
       <div className="filter-bar">
         <div className="filter-group">
-          {['all', 'income', 'expense'].map(f => (
+          {['all', 'income', 'expense', 'transfer'].map(f => (
             <button key={f} className={`filter-btn ${filter === f ? 'active' : ''}`}
               onClick={() => setFilter(f)}>
               {f.charAt(0).toUpperCase() + f.slice(1)}

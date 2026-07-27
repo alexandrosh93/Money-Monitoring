@@ -191,7 +191,7 @@ export default function App() {
         ) : (
           <>
             {tab === 'dashboard' && (
-              <Dashboard summary={summary} transactions={transactions} />
+              <Dashboard summary={summary} transactions={transactions} accounts={accounts} />
             )}
             {tab === 'transactions' && (
               <TransactionList

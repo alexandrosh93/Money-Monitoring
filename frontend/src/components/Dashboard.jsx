@@ -2,7 +2,14 @@ import { useState } from 'react';
 import { IconArrowUp, IconArrowDown, IconSwap, IconChevronRight, IconCash, IconBank, IconEmpty } from './Icons.jsx';
 import AccountStatement from './AccountStatement.jsx';
 
-export default function Dashboard({ summary, transactions }) {
+const PERSON_COLORS = {
+  Anna: '#ec4899',
+  Stelios: '#f97316',
+  Alexandros: '#2563eb',
+};
+const personColor = (name) => PERSON_COLORS[name] || 'var(--primary)';
+
+export default function Dashboard({ summary, transactions, accounts }) {
   const recent = transactions.slice(0, 5);
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
   const [statementTarget, setStatementTarget] = useState(null);
@@ -56,12 +63,17 @@ export default function Dashboard({ summary, transactions }) {
               <div
                 key={person.name}
                 className="person-card clickable"
-                style={{ borderLeftColor: 'var(--primary)' }}
-                onClick={() => setStatementTarget({ title: person.name, color: 'var(--primary)', accountIds: person.accountIds })}
+                style={{ borderLeftColor: personColor(person.name) }}
+                onClick={() => setStatementTarget({
+                  title: person.name,
+                  color: personColor(person.name),
+                  accountIds: person.accountIds,
+                  subAccounts: accounts.filter(a => a.group_name === person.name),
+                })}
               >
                 <div className="person-header">
                   <span className="person-name">
-                    <span className="person-avatar" style={{ background: `linear-gradient(135deg, var(--primary), var(--primary-dark))` }}>
+                    <span className="person-avatar" style={{ background: personColor(person.name) }}>
                       {person.name.charAt(0).toUpperCase()}
                     </span>
                     {person.name}
@@ -159,6 +171,7 @@ export default function Dashboard({ summary, transactions }) {
           title={statementTarget.title}
           color={statementTarget.color}
           accountIds={statementTarget.accountIds}
+          subAccounts={statementTarget.subAccounts}
           transactions={transactions}
           onClose={() => setStatementTarget(null)}
         />

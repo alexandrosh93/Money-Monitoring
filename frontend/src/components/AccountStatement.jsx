@@ -1,9 +1,16 @@
+import { useState } from 'react';
 import { IconArrowUp, IconArrowDown, IconSwap, IconClose, IconEmpty } from './Icons.jsx';
 
-export default function AccountStatement({ title, color, accountIds, transactions, onClose }) {
-  const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
+const subLabel = (name) => name.split(' - ').slice(1).join(' - ') || name;
 
-  const accountTxs = transactions.filter(t => accountIds.includes(t.account_id));
+export default function AccountStatement({ title, color, accountIds, subAccounts, transactions, onClose }) {
+  const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
+  const [filterId, setFilterId] = useState('all');
+
+  const activeIds = filterId === 'all' ? accountIds : [filterId];
+  const activeAccount = filterId !== 'all' ? subAccounts?.find(a => a.id === filterId) : null;
+
+  const accountTxs = transactions.filter(t => activeIds.includes(t.account_id));
   const ascending = [...accountTxs].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
     return String(a.created_at || '').localeCompare(String(b.created_at || ''));
@@ -23,11 +30,24 @@ export default function AccountStatement({ title, color, accountIds, transaction
         <div className="modal-handle" />
         <div className="modal-header">
           <h2>
-            <span className="cat-dot" style={{ background: color, marginRight: '0.5rem' }} />
-            {title}
+            <span className="cat-dot" style={{ background: activeAccount?.color || color, marginRight: '0.5rem' }} />
+            {title}{activeAccount ? ` · ${subLabel(activeAccount.name)}` : ''}
           </h2>
           <button className="close-btn" onClick={onClose} aria-label="Close"><IconClose size={16} /></button>
         </div>
+
+        {subAccounts && subAccounts.length > 1 && (
+          <div className="statement-filter">
+            <button className={`statement-filter-btn ${filterId === 'all' ? 'active' : ''}`} onClick={() => setFilterId('all')}>
+              All
+            </button>
+            {subAccounts.map(a => (
+              <button key={a.id} className={`statement-filter-btn ${filterId === a.id ? 'active' : ''}`} onClick={() => setFilterId(a.id)}>
+                {subLabel(a.name)}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="statement-balance">
           <span className="card-label">Current Balance</span>
