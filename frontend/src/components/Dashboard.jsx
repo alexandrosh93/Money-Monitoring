@@ -113,32 +113,6 @@ export default function Dashboard({ summary, transactions, accounts }) {
         </div>
       )}
 
-      {summary.byCategory.length > 0 && (
-        <div className="card">
-          <h3 className="section-title">Spending by Category</h3>
-          <div className="category-bars">
-            {summary.byCategory
-              .filter(c => c.type === 'expense')
-              .slice(0, 6)
-              .map((c, i) => {
-                const max = Math.max(...summary.byCategory.filter(x => x.type === 'expense').map(x => x.total));
-                const pct = max > 0 ? (c.total / max) * 100 : 0;
-                return (
-                  <div key={i} className="bar-item">
-                    <div className="bar-label">
-                      <span>{c.name || 'Uncategorized'}</span>
-                      <span>{fmt(c.total)}</span>
-                    </div>
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{ width: `${pct}%`, background: c.color || '#6366f1' }} />
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
       <div className="card">
         <h3 className="section-title">Recent Transactions</h3>
         {recent.length === 0 ? (

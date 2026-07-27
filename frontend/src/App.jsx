@@ -9,9 +9,11 @@ import TransferForm from './components/TransferForm.jsx';
 import Login from './components/Login.jsx';
 import { IconHome, IconList, IconWallet, IconTag, IconSwap, IconPlus, IconEuro, IconClose, IconLogout } from './components/Icons.jsx';
 
-const TABS = [
+const LEFT_TABS = [
   { key: 'dashboard', label: 'Home', Icon: IconHome },
   { key: 'transactions', label: 'History', Icon: IconList },
+];
+const RIGHT_TABS = [
   { key: 'accounts', label: 'Accounts', Icon: IconWallet },
   { key: 'categories', label: 'Categories', Icon: IconTag },
 ];
@@ -20,8 +22,9 @@ export default function App() {
   const [session, setSession] = useState(undefined);
   const [tab, setTab] = useState('dashboard');
   const [showForm, setShowForm] = useState(false);
+  const [showActionMenu, setShowActionMenu] = useState(false);
   const [formMode, setFormMode] = useState('transaction');
-  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byCategory: [], byAccount: [], byPerson: [], totalCash: 0, totalBank: 0 });
+  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, byAccount: [], byPerson: [], totalCash: 0, totalBank: 0 });
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -60,14 +63,6 @@ export default function App() {
       const income = realTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
       const expense = realTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
-      const catMap = {};
-      realTxs.forEach(t => {
-        const key = `${t.category_id}-${t.type}`;
-        if (!catMap[key]) catMap[key] = { name: t.category_name, color: t.category_color, type: t.type, total: 0 };
-        catMap[key].total += t.amount;
-      });
-      const byCategory = Object.values(catMap).sort((a, b) => b.total - a.total);
-
       const accountMap = {};
       (accts || []).forEach(a => { accountMap[a.id] = { id: a.id, name: a.name, color: a.color, group_name: a.group_name, kind: a.kind, income: 0, expense: 0, balance: 0 }; });
       numericTxs.forEach(t => {
@@ -96,7 +91,7 @@ export default function App() {
       setCategories(cats || []);
       setAccounts(accts || []);
       setTransactions(numericTxs);
-      setSummary({ income, expense, balance: income - expense, byCategory, byAccount, byPerson, totalCash, totalBank });
+      setSummary({ income, expense, balance: income - expense, byAccount, byPerson, totalCash, totalBank });
     } finally {
       setLoading(false);
     }
@@ -171,9 +166,6 @@ export default function App() {
             Money Monitor
           </h1>
           <div className="header-actions">
-            <button className="btn btn-ghost header-btn" onClick={() => { setFormMode('transfer'); setShowForm(true); }}>
-              <IconSwap size={16} /> Transfer
-            </button>
             <button className="btn btn-ghost header-icon-btn" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
               <IconLogout size={16} />
             </button>
@@ -212,12 +204,23 @@ export default function App() {
         )}
       </main>
 
-      <button className="fab" onClick={() => { setFormMode('transaction'); setShowForm(true); }} aria-label="Add Transaction">
-        <IconPlus size={26} />
-      </button>
-
       <nav className="tab-nav">
-        {TABS.map(({ key, label, Icon }) => (
+        {LEFT_TABS.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            className={`tab-btn ${tab === key ? 'active' : ''}`}
+            onClick={() => setTab(key)}
+          >
+            <span className="tab-icon"><Icon size={21} /></span>
+            {label}
+          </button>
+        ))}
+
+        <button className="nav-fab" onClick={() => setShowActionMenu(true)} aria-label="Quick add">
+          <IconPlus size={24} />
+        </button>
+
+        {RIGHT_TABS.map(({ key, label, Icon }) => (
           <button
             key={key}
             className={`tab-btn ${tab === key ? 'active' : ''}`}
@@ -228,6 +231,34 @@ export default function App() {
           </button>
         ))}
       </nav>
+
+      {showActionMenu && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowActionMenu(false)}>
+          <div className="modal action-menu">
+            <div className="modal-handle" />
+            <div className="modal-header">
+              <h2>Quick Add</h2>
+              <button className="close-btn" onClick={() => setShowActionMenu(false)} aria-label="Close"><IconClose size={16} /></button>
+            </div>
+            <div className="action-menu-grid">
+              <button
+                className="action-menu-item"
+                onClick={() => { setFormMode('transaction'); setShowForm(true); setShowActionMenu(false); }}
+              >
+                <span className="action-menu-icon transaction"><IconPlus size={22} /></span>
+                <span>Add Transaction</span>
+              </button>
+              <button
+                className="action-menu-item"
+                onClick={() => { setFormMode('transfer'); setShowForm(true); setShowActionMenu(false); }}
+              >
+                <span className="action-menu-icon transfer"><IconSwap size={22} /></span>
+                <span>Add Transfer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
