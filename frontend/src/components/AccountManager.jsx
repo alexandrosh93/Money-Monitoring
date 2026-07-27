@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { supabase } from '../supabase.js';
-import { IconTrash, IconChevronRight } from './Icons.jsx';
+import { IconTrash, IconChevronRight, IconDownload } from './Icons.jsx';
 import AccountStatement from './AccountStatement.jsx';
+import ConfirmDelete from './ConfirmDelete.jsx';
 
-export default function AccountManager({ accounts, transactions, onRefresh }) {
+export default function AccountManager({ accounts, transactions, onRefresh, onExport }) {
   const [isPersonAccount, setIsPersonAccount] = useState(false);
   const [name, setName] = useState('');
   const [personName, setPersonName] = useState('');
@@ -12,6 +13,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
   const [color, setColor] = useState('#2563eb');
   const [error, setError] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fmt = (n) => new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR' }).format(n);
   const balanceFor = (accountId) =>
@@ -51,6 +53,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
 
   const handleDelete = async (id) => {
     const { error: err } = await supabase.from('money_monitor_accounts').delete().eq('id', id);
+    setDeleteTarget(null);
     if (err) { setError(err.message); return; }
     onRefresh();
   };
@@ -69,7 +72,7 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
         {fmt(balanceFor(account.id))}
       </span>
       <span className="account-row-chevron"><IconChevronRight size={16} /></span>
-      <button className="delete-btn" onClick={(e) => { e.stopPropagation(); handleDelete(account.id); }} title="Delete" aria-label="Delete">
+      <button className="delete-btn" onClick={(e) => { e.stopPropagation(); setDeleteTarget(account); }} title="Delete" aria-label="Delete">
         <IconTrash size={15} />
       </button>
     </li>
@@ -138,6 +141,14 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
       </div>
 
       <div className="card">
+        <h3 className="section-title">Backup</h3>
+        <p className="helper-text">Download all your accounts, categories, and transactions as a JSON file — a personal backup you control, kept safe on your own device.</p>
+        <button className="btn btn-primary" onClick={onExport}>
+          <IconDownload size={16} /> Export Data (JSON)
+        </button>
+      </div>
+
+      <div className="card">
         <h3 className="section-title">Accounts</h3>
         <p className="helper-text">Tap an account to see its statement and running balance.</p>
         {accounts.length === 0 ? <p className="empty-state">No accounts yet.</p> : (
@@ -170,6 +181,15 @@ export default function AccountManager({ accounts, transactions, onRefresh }) {
           accountIds={[selectedAccount.id]}
           transactions={transactions}
           onClose={() => setSelectedAccount(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <ConfirmDelete
+          title="Delete Account"
+          message={`Enter your password to delete "${deleteTarget.name}". This only works if it has no transactions — otherwise it's blocked to protect your history.`}
+          onConfirm={() => handleDelete(deleteTarget.id)}
+          onCancel={() => setDeleteTarget(null)}
         />
       )}
     </div>

@@ -99,6 +99,13 @@ export const IconBank = ({ size = 18 }) => (
   </svg>
 );
 
+export const IconDownload = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
+    <path d="M12 4v11M7 10l5 5 5-5" />
+    <path d="M4 18v1.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V18" />
+  </svg>
+);
+
 export const IconEmpty = ({ size = 40 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...base}>
     <rect x="3" y="6" width="18" height="13" rx="2" />

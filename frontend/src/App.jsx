@@ -124,6 +124,22 @@ export default function App() {
     fetchAll();
   };
 
+  const handleExportData = () => {
+    const payload = {
+      exported_at: new Date().toISOString(),
+      accounts,
+      categories,
+      transactions,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `money-monitor-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -162,7 +178,7 @@ export default function App() {
               />
             )}
             {tab === 'accounts' && (
-              <AccountManager accounts={accounts} transactions={transactions} onRefresh={fetchAll} />
+              <AccountManager accounts={accounts} transactions={transactions} onRefresh={fetchAll} onExport={handleExportData} />
             )}
             {tab === 'categories' && (
               <CategoryManager categories={categories} onRefresh={fetchAll} />

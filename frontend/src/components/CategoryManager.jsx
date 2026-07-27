@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { supabase } from '../supabase.js';
 import { IconTrash } from './Icons.jsx';
+import ConfirmDelete from './ConfirmDelete.jsx';
 
 export default function CategoryManager({ categories, onRefresh }) {
   const [form, setForm] = useState({ name: '', type: 'expense', color: '#6366f1' });
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const incomeCategories = categories.filter(c => c.type === 'income');
   const expenseCategories = categories.filter(c => c.type === 'expense');
@@ -22,6 +24,7 @@ export default function CategoryManager({ categories, onRefresh }) {
 
   const handleDelete = async (id) => {
     await supabase.from('money_monitor_categories').delete().eq('id', id);
+    setDeleteTarget(null);
     onRefresh();
   };
 
@@ -34,7 +37,7 @@ export default function CategoryManager({ categories, onRefresh }) {
             <li key={c.id} className="cat-item">
               <span className="cat-dot" style={{ background: c.color }} />
               <span className="cat-name">{c.name}</span>
-              <button className="delete-btn" onClick={() => handleDelete(c.id)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
+              <button className="delete-btn" onClick={() => setDeleteTarget(c)} title="Delete" aria-label="Delete"><IconTrash size={15} /></button>
             </li>
           ))}
         </ul>
@@ -74,6 +77,15 @@ export default function CategoryManager({ categories, onRefresh }) {
 
       <CategoryGroup title="Income Categories" cats={incomeCategories} type="income" />
       <CategoryGroup title="Expense Categories" cats={expenseCategories} type="expense" />
+
+      {deleteTarget && (
+        <ConfirmDelete
+          title="Delete Category"
+          message={`Enter your password to delete "${deleteTarget.name}". Transactions using it will keep their history but show as "Uncategorized".`}
+          onConfirm={() => handleDelete(deleteTarget.id)}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 }
