@@ -225,24 +225,31 @@ export default function App() {
             key={key}
             className={`tab-btn ${tab === key ? 'active' : ''}`}
             onClick={() => setTab(key)}
+            aria-label={label}
+            title={label}
           >
             <span className="tab-icon"><Icon size={21} /></span>
-            {label}
+            <span className="tab-label">{label}</span>
           </button>
         ))}
 
-        <button className="nav-fab" onClick={() => setShowActionMenu(true)} aria-label="Quick add">
-          <IconPlus size={24} />
-        </button>
+        <div className="nav-fab-item">
+          <button className="nav-fab" onClick={() => setShowActionMenu(true)} aria-label="Quick Add" title="Quick Add">
+            <IconPlus size={24} />
+          </button>
+          <span className="nav-fab-label">Add</span>
+        </div>
 
         {RIGHT_TABS.map(({ key, label, Icon }) => (
           <button
             key={key}
             className={`tab-btn ${tab === key ? 'active' : ''}`}
             onClick={() => setTab(key)}
+            aria-label={label}
+            title={label}
           >
             <span className="tab-icon"><Icon size={21} /></span>
-            {label}
+            <span className="tab-label">{label}</span>
           </button>
         ))}
       </nav>

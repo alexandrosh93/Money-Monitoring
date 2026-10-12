@@ -195,6 +195,18 @@ button, input, select { font-family: inherit; }
 .tab-btn.active { color: var(--primary); background: var(--primary-light); }
 .tab-btn:active { transform: scale(0.94); }
 .tab-icon { display: flex; align-items: center; justify-content: center; height: 22px; }
+.tab-label { display: block; }
+.nav-fab-item {
+  flex: 0 0 3.75rem;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
 .nav-fab {
   flex: 0 0 auto;
   width: 3.5rem; height: 3.5rem;
@@ -207,6 +219,7 @@ button, input, select { font-family: inherit; }
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .nav-fab:active { transform: translateY(-14px) scale(0.9); }
+.nav-fab-label { margin-top: -0.6875rem; line-height: 1; }
 
 /* Main */
 .main-content {
